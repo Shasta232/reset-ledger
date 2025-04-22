@@ -9,11 +9,18 @@ export async function getServerSideProps() {
       'Content-Type': 'application/json'
     };
 
-    const goldRes = await fetch('https://www.goldapi.io/api/XAU/USD', { headers });
-    const silverRes = await fetch('https://www.goldapi.io/api/XAG/USD', { headers });
+    const [goldData, silverData] = await Promise.all([
+      (async function () {
+        const goldRes = await fetch('https://www.goldapi.io/api/XAU/USD', { headers });
 
-    const goldData = await goldRes.json();
-    const silverData = await silverRes.json();
+        return await goldRes.json();
+      })(),
+      (async function () {
+        const silverRes = await fetch('https://www.goldapi.io/api/XAG/USD', { headers });
+
+        return await silverRes.json();
+      })()
+    ]);
 
     const gold = goldData.price;
     const silver = silverData.price;
