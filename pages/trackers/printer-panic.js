@@ -4,13 +4,15 @@ export async function getServerSideProps() {
   const fallback = { rrp: 58000, status: 'PANIC', trend: '↓', updated: 'Unavailable' };
 
   try {
-    const res = await fetch('https://api.stlouisfed.org/fred/series/observations?series_id=RRPONTSYD&api_key=c820e0ce56eee34bb625b87367825a49&file_type=json&sort_order=desc&limit=10');
+    const res = await fetch(
+      'https://api.stlouisfed.org/fred/series/observations?series_id=RRPONTSYD&api_key=c820e0ce56eee34bb625b87367825a49&file_type=json&sort_order=desc&limit=10'
+    );
     const data = await res.json();
 
-    // Get the two most recent *valid* observations
+    // Filter out entries where value is "."
     const valid = data.observations.filter(obs => obs.value !== ".");
 
-    if (valid.length < 2) throw new Error("Insufficient valid data");
+    if (valid.length < 2) throw new Error("Insufficient valid RRP data.");
 
     const latest = valid[0];
     const prev = valid[1];
@@ -19,20 +21,27 @@ export async function getServerSideProps() {
     const trend = rrp > parseFloat(prev.value) ? '↑' : rrp < parseFloat(prev.value) ? '↓' : '→';
 
     let status = 'SAFE';
-
     if (rrp < 100) status = 'RISK';
     if (rrp < 60) status = 'PANIC';
 
-
     return {
       props: {
-        rrp: rrp.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }),
+        rrp: rrp.toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          maximumFractionDigits: 0
+        }),
         trend,
         status,
         updated: latest.date
       }
     };
-};
+  } catch (err) {
+    console.error('RRP fetch failed:', err);
+    return { props: fallback };
+  }
+}
+
 
 export default function PrinterPanic({ rrp, trend, status, updated }) {
   return (
