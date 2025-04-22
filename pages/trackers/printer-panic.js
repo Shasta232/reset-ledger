@@ -31,8 +31,8 @@ export async function getServerSideProps() {
         status,
         updated: latest.date
       }
-    }
-}
+    };
+};
 
 export default function PrinterPanic({ rrp, trend, status, updated }) {
   return (
