@@ -18,7 +18,7 @@ export async function getServerSideProps() {
     const prev = valid[1];
 
     const rrp = parseFloat(latest.value);
-    const prrp = parseFloat(latest.value);
+    const prrp = parseFloat(prev.value);
     const trend = rrp > prrp  ? '↑' : rrp < prrp  ? '↓' : '→';
 
     let status = 'SAFE';
