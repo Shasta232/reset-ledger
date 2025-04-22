@@ -57,7 +57,8 @@ export default function GSRTracker() {
       </section>
 
       <footer className="text-xs text-gray-500 border-t border-gray-800 pt-4 mt-12">
-        <p>GSR Tracker · The Reset Ledger · reset-ledger.vercel.app</p>
+        <p>GSR Tracker · Monetary Intel · www.monetaryintel.com</p>
+
       </footer>
     </main>
   );
