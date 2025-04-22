@@ -24,7 +24,7 @@ export async function getServerSideProps() {
     let status = 'SAFE';
     if (rrp < 100) status = 'RISK';
     if (rrp < 60) status = 'PANIC';
-    if (prrp - rrp > 20) status += ' but... likely liquidity injection overnight. (Money printer goes brrr...)';
+    if (rrp - prrp > 20) status += ' but... likely liquidity injection overnight. (Money printer goes brrr...)';
 
     return {
       props: {
