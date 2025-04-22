@@ -18,11 +18,13 @@ export async function getServerSideProps() {
     const prev = valid[1];
 
     const rrp = parseFloat(latest.value);
-    const trend = rrp > parseFloat(prev.value) ? '↑' : rrp < parseFloat(prev.value) ? '↓' : '→';
+    const prrp = parseFloat(latest.value);
+    const trend = rrp > prrp  ? '↑' : rrp < prrp  ? '↓' : '→';
 
     let status = 'SAFE';
     if (rrp < 100) status = 'RISK';
     if (rrp < 60) status = 'PANIC';
+    if (prrp - rrp > 20) status += ' but... likely liquidity injection overnight. (Money printer goes brrr...)';
 
     return {
       props: {
@@ -52,7 +54,7 @@ export default function PrinterPanic({ rrp, trend, status, updated }) {
       <section className="mb-6">
         <h2 className="text-2xl text-red-300 font-semibold mb-2">📡 Live RRP Data</h2>
         <ul className="text-sm text-gray-300 list-disc pl-6">
-          <li>RRP Balance: <span className="text-white font-bold">{rrp}</span></li>
+          <li>RRP Balance: <span className="text-white font-bold">{rrp}b</span></li>
           <li>Trend: <span className="text-white font-bold">{trend}</span></li>
           <li>Signal: <span className="text-white font-bold">{status}</span></li>
           <li>Last Updated: <span className="text-white">{updated}</span></li>
