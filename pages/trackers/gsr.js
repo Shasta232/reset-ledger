@@ -1,10 +1,35 @@
 import Link from 'next/link';
 
-export default function GSRTracker() {
+export async function getServerSideProps() {
+  const fallback = { gold: 3450, silver: 33.0, gsr: 104.5 };
+
+  try {
+    const headers = {
+      'x-access-token': 'goldapi-3tb84sm9s4fz1g-io',
+      'Content-Type': 'application/json'
+    };
+
+    const goldRes = await fetch('https://www.goldapi.io/api/XAU/USD', { headers });
+    const silverRes = await fetch('https://www.goldapi.io/api/XAG/USD', { headers });
+
+    const goldData = await goldRes.json();
+    const silverData = await silverRes.json();
+
+    const gold = goldData.price;
+    const silver = silverData.price;
+    const gsr = +(gold / silver).toFixed(2);
+
+    return { props: { gold: gold.toFixed(2), silver: silver.toFixed(2), gsr } };
+  } catch (err) {
+    return { props: fallback };
+  }
+}
+
+export default function GSRTracker({ gold, silver, gsr }) {
   return (
     <main className="min-h-screen bg-black text-white font-sans px-6 py-10">
       <h1 className="text-4xl font-bold text-gray-200 mb-4">⚪ GSR Tracker (Gold–Silver Ratio)</h1>
-      <p className="text-sm text-gray-400 mb-6">Last Updated: April 21, 2025</p>
+      <p className="text-sm text-gray-400 mb-6">Live Update · Signal Tracker</p>
 
       <section className="mb-8">
         <h2 className="text-2xl text-yellow-300 font-semibold mb-2">🧠 What It Tracks</h2>
@@ -17,9 +42,9 @@ export default function GSRTracker() {
       <section className="mb-8">
         <h2 className="text-2xl text-yellow-300 font-semibold mb-2">📈 Live Readings</h2>
         <ul className="list-disc text-sm pl-6 text-gray-200">
-          <li>Gold Price: <span className="text-white font-bold">$3,403</span></li>
-          <li>Silver Price: <span className="text-white font-bold">$33.05</span></li>
-          <li>Current GSR: <span className="text-white font-bold">102.9</span> — historically stretched</li>
+          <li>Gold Price: <span className="text-white font-bold">${gold}</span></li>
+          <li>Silver Price: <span className="text-white font-bold">${silver}</span></li>
+          <li>Current GSR: <span className="text-white font-bold">{gsr}</span> — auto-calculated</li>
           <li>Trigger Zone: GSR &lt; 100 = Silver ignition likely</li>
         </ul>
       </section>
@@ -28,7 +53,7 @@ export default function GSRTracker() {
         <h2 className="text-2xl text-yellow-300 font-semibold mb-2">🔎 Interpretation</h2>
         <p className="text-gray-300 text-sm">
           When GSR compresses below 100, silver often enters a violent catch-up rally. This typically follows gold breakouts
-          and coincides with monetary panic signals or liquidity events. Silver tends to outperform during fiscal stress and currency revaluation cycles.
+          and coincides with monetary panic signals or liquidity events.
         </p>
       </section>
 
@@ -49,8 +74,8 @@ export default function GSRTracker() {
             </Link>
           </li>
           <li>
-            <Link href="/trackers/reset-watch" className="text-yellow-300 underline hover:text-yellow-100">
-              🟡 Monetary Reset Watch
+            <Link href="/trackers/fed-bs" className="text-yellow-300 underline hover:text-yellow-100">
+              🟤 Fed BS-to-Truth Translator
             </Link>
           </li>
         </ul>
@@ -58,7 +83,6 @@ export default function GSRTracker() {
 
       <footer className="text-xs text-gray-500 border-t border-gray-800 pt-4 mt-12">
         <p>GSR Tracker · Monetary Intel · www.monetaryintel.com</p>
-
       </footer>
     </main>
   );
